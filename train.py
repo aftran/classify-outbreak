@@ -19,7 +19,7 @@ for line in open(corpus_path):
 		datum = Datum(line)
 		context.extend(feature_template(datum))
 	m.add_event(context, datum.relevant)
-#	print context
+	print context
 m.end_add_event()
 
 m.train(100, 'gis', 2)
