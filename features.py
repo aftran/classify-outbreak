@@ -19,4 +19,7 @@ def f3(datum):
 def f4(datum):
 	return [str(len(datum.feed_url) % 8)]
 
-feature_templates = [make_searcher('confirmed'), f2, f3, f4]
+feature_templates = [
+	make_searcher('confirmed'),
+	make_searcher('-associated')
+]

@@ -1,4 +1,6 @@
-"Wrapper around the contents of one line in a GVFI-annotated document."
+"""Wrapper around the contents of one line in a GVFI-annotated corpus of web
+   documents.
+"""
 
 class Datum:
 	def __init__(self, line):
