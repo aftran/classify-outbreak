@@ -1,10 +1,10 @@
-from re import search
+from re import search, IGNORECASE
 
 "Some baseline features for testing the classifier."
 
-def make_searcher(substring, field='content'):
+def make_searcher(substring, field='content', flags=IGNORECASE):
 	def result(datum):
-		if search(substring, datum.__dict__[field]):
+		if search(substring, datum.__dict__[field], flags):
 			return ['has_substring_' + substring]
 		else:
 			return []
