@@ -5,3 +5,4 @@
 class Datum:
 	def __init__(self, line):
 		[self.relevant, self.title, self.content, self.article_url, self.feed_url, self.id_article, self.id_feed, self.language, self.date] = line.split('	')
+		self.date = self.date[:-1]
