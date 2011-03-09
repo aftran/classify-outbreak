@@ -15,8 +15,8 @@ m = MaxentModel()
 m.begin_add_event()
 for line in open(corpus_path):
 	context = []
+	datum = Datum(line)
 	for feature_template in feature_templates:
-		datum = Datum(line)
 		context.extend(feature_template(datum))
 	m.add_event(context, datum.relevant)
 	print context
