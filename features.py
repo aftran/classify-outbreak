@@ -2,7 +2,7 @@ from re import search, IGNORECASE
 
 "Some baseline features for testing the classifier."
 
-def make_searcher(substring, field='content', flags=IGNORECASE):
+def make_searcher(substring, field='article_snippet', flags=IGNORECASE):
 	def result(datum):
 		if search(substring, datum.__dict__[field], flags):
 			return ['has_substring_' + substring]
