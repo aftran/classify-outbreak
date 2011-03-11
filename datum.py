@@ -4,6 +4,8 @@ import csv
    documents.
 """
 
+non_ignored_classes = ['unrelated', 'just_disease', 'outbreak'] # ignore 'dont_know' and ''
+
 class Datum:
 	def __init__(self, row):
 		[
@@ -46,6 +48,7 @@ def read_gvfi(path):
 	result = {}
 	for row in reader:
 		datum = Datum(row)
-		result.setdefault(datum.id_article, [])
-		result[datum.id_article].append(datum)
+		if datum.is_related in non_ignored_classes:
+			result.setdefault(datum.id_article, [])
+			result[datum.id_article].append(datum)
 	return result
