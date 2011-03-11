@@ -4,7 +4,7 @@ import csv
    documents.
 """
 
-non_ignored_classes = ['unrelated', 'just_disease', 'outbreak'] # ignore 'dont_know' and ''
+non_ignored_classes = ['unrelated', 'just_disease', 'outbreak'] # ignore 'cant_tell' and ''
 
 class Datum:
 	def __init__(self, row):
