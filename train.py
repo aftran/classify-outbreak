@@ -3,10 +3,11 @@
 """Trains a maximum entropy model on the given training file.
 """
 
-from optparse import OptionParser
-from maxent   import MaxentModel
-from datum    import *
-from features import feature_templates, datum2features
+from optparse         import OptionParser
+from maxent           import MaxentModel
+from datum            import *
+from features         import feature_templates
+from feature_counting import *
 
 option_parser = OptionParser()
 (_, [corpus_path, out_path]) = option_parser.parse_args()

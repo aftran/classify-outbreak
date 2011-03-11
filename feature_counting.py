@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
-"""Maps a corpus of GVFI examples into its feature-counts representation and
-   outputs it as a file suitable for feeding to the 'maxent' command-line program
-   in MMTK.
-"""
+"""Utility functions for counting features in articles."""
 
 from datum    import *
 from features import *
@@ -15,23 +12,63 @@ def datum2features(datum):
 		result.extend(feature_template(datum))
 	return result
 
-# TODO: Have a function for outputting both a testing and a training corpus, making sure the same article doesn't show up in both.  With a function for splitting a corpus dictionary by key subsets.
-
 def corpus2features(corpus):
-	"""Copies the given corpus and turns each datum into a list of its features."""
+	"""Copies the given corpus and turns each datum into
+	   	(is_related, features),
+	   where is_related is its class and features is a list of its
+	   features.
+	"""
 	result = {}
 	for (id_article, datums) in corpus.iteritems():
-		result.setdefault(id_article, [])
-		result[id_article] = map(datum2features, datums)
+		result[id_article] = map(lambda d: (d.is_related, datum2features(d)), datums)
+	return result
 
-	
+def file2feature_count_file(corpus_path, out_path):
+	"""Maps a corpus of GVFI examples into its feature-counts
+	   representation and outputs it as a file suitable for feeding to the
+	   'maxent' command-line program in MMTK.
+	"""
+	corpus2feature_count_file(read_gvfi(corpus_path))
 
-# def project_to_file(corpus_path, out_path):
-# 	corpus = read_gvfi(corpus_path)
-# 	outfile = open(out_path, 'w')
-# 	for datums in corpus.values():
-# 		for datum in datums:
-# 			context = []
-# 			for feature_template in feature_templates:
-# 				context.extend(feature_template(datum))
-# 		outfile.write(...)
+def corpus2feature_count_file(corpus, out_path):
+	featured_corpus = corpus2features(corpus)
+	outfile = open(out_path, 'w')
+	for datums in featured_corpus.values():
+		for (is_related, featurelist) in datums:
+			outfile.write(is_related)
+			outfile.write(' ')
+			outfile.write(' '.join(featurelist))
+			# MMTK crashes if we have no active features:
+			if featurelist == []:
+				print 'Warning: We have a datum that no features matched.'
+				outfile.write('no_other_features_matched_this_article')
+			outfile.write('\n')
+
+def split_corpus(corpus, denominator=12):
+	"""Hold out every n-th item in the given dictionary.
+	   Returns (training, heldout).
+	   Determinismic as long as the keys are fully-ordered.
+	"""
+	training = {}
+	heldout  = {}
+	i = 4 # initial value unimportant but affects which subset we hold out
+	for (k,v) in sorted(corpus.items()):
+		if i == 0:	heldout[k]  = v
+		else:		training[k] = v
+		i = (i + 1) % denominator
+	return (training, heldout)
+
+def file2heldout_feature_count_files(corpus_path, training_path, heldout_path, denominator):
+	"""Compute feature counts, output to training_path, hold out
+	   every denominator-th article in the corpus and output it to
+	   holdout_path.  An article will never show up in both the training
+	   and the heldout file.
+	   The size of the heldout set won't necessarily be 1/denominator times
+	   the size of the input corpus, since we split the corpus by article
+	   rather than annotation instance, and there are often many annotation
+	   instances per article.
+	"""
+	corpus = read_gvfi(corpus_path)
+	(training, heldout) = split_corpus(corpus, denominator)
+	corpus2feature_count_file(training, training_path)
+	corpus2feature_count_file(heldout, heldout_path)

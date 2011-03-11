@@ -18,10 +18,3 @@ feature_templates = [
 	make_searcher('confirmed'),
 	make_searcher('-associated')
 ]
-
-def datum2features(datum):
-	"""The features for the given datum, in list form."""
-	result = []
-	for feature_template in feature_templates:
-		result.extend(feature_template(datum))
-	return result
