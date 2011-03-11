@@ -44,6 +44,19 @@ def corpus2feature_count_file(corpus, out_path):
 				outfile.write('no_other_features_matched_this_article')
 			outfile.write('\n')
 
+def corpus2file(corpus, out_path):
+	outfile = open(out_path, 'w')
+	for datums in corpus.values():
+		for datum in datums:
+			outfile.write(datum.id_article)
+			outfile.write('	should be ')
+			outfile.write(datum.is_related)
+			outfile.write('	')
+			outfile.write('	'.join(
+				[datum.title, datum.article_url, datum.article_snippet]))
+			outfile.write('\n')
+
+
 def split_corpus(corpus, denominator=12):
 	"""Hold out every n-th item in the given dictionary.
 	   Returns (training, heldout).
@@ -67,8 +80,14 @@ def file2heldout_feature_count_files(corpus_path, training_path, heldout_path, d
 	   the size of the input corpus, since we split the corpus by article
 	   rather than annotation instance, and there are often many annotation
 	   instances per article.
+	   Also outputs the preimages of the training and heldout sets to
+	   training_path.preimage and deldout_path.preimage.
 	"""
 	corpus = read_gvfi(corpus_path)
 	(training, heldout) = split_corpus(corpus, denominator)
+
 	corpus2feature_count_file(training, training_path)
 	corpus2feature_count_file(heldout, heldout_path)
+
+	corpus2file(training, training_path + '.preimage')
+	corpus2file(heldout, heldout_path + '.preimage')
