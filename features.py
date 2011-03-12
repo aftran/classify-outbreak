@@ -1,5 +1,6 @@
 from re     import search, IGNORECASE
 from string import strip, punctuation
+import re
 import nltk
 
 "Features for the classifier."
@@ -27,6 +28,16 @@ def stems_in(field):
 		for word in datum.__dict__[field].split():
 			stemset.add(stemmer(strip(word.lower(), punctuation)))
 		return map(mkfeature, stemset)
+	return result
+
+def subdomain(datum):
+	"""Makes a feature for the subdomain.  For example, an article from
+	   www2.portal.nature.com will have the subbdomain_portal.nature.com feature.
+	"""
+	m = re.match('http://(www.?\.)?([^/]*)/(([^/]*/)*)', datum.article_url)
+	result = []
+	if hasattr(m, 'groups') and len(m.groups()) > 1:
+		result.append('subdomain_' + m.groups()[1])
 	return result
 
 # Since NER is slow, only do it for the first cutoff_for_ner characters of the
@@ -87,7 +98,6 @@ matcher_features = map(make_searcher, [
 	)
 
 other_features = [
-	# TODO: URL features.
 	named_entities,
 	make_searcher('(epi|pan)demic', 'title'),
 	make_searcher('H\dN\d', field='article_snippet', flags=0), # names of flu subtypes, like H1N1
@@ -95,7 +105,8 @@ other_features = [
 	# TODO: Maybe strip away non-word symbols like in "(ap)" and "prosecutors:".
 	# TODO: Maybe get the word STEMS in the title, not the words.
 	# TODO: Replace all numbers with a single digit or something.
-
+	subdomain
+	# TODO: Other URL features.
 	]
 
 feature_templates = matcher_features + other_features
