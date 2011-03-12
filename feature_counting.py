@@ -23,15 +23,7 @@ def corpus2features(corpus):
 		result[id_article] = map(lambda d: (d.is_related, datum2features(d)), datums)
 	return result
 
-def file2feature_count_file(corpus_path, out_path):
-	"""Maps a corpus of GVFI examples into its feature-counts
-	   representation and outputs it as a file suitable for feeding to the
-	   'maxent' command-line program in MMTK.
-	"""
-	corpus2feature_count_file(read_gvfi(corpus_path))
-
-def corpus2feature_count_file(corpus, out_path):
-	featured_corpus = corpus2features(corpus)
+def features2feature_count_file(featured_corpus, out_path):
 	outfile = open(out_path, 'w')
 	for datums in featured_corpus.values():
 		for (is_related, featurelist) in datums:
@@ -44,18 +36,15 @@ def corpus2feature_count_file(corpus, out_path):
 				outfile.write('no_other_features_matched_this_article')
 			outfile.write('\n')
 
+
 def corpus2file(corpus, out_path):
 	outfile = open(out_path, 'w')
 	for datums in corpus.values():
 		for datum in datums:
 			outfile.write(datum.id_article)
-			outfile.write('	should be ')
-			outfile.write(datum.is_related)
 			outfile.write('	')
-			outfile.write('	'.join(
-				[datum.title, datum.article_url, datum.article_snippet]))
+			outfile.write(datum.is_related)
 			outfile.write('\n')
-
 
 def split_corpus(corpus, denominator=12, intercept = 4):
 	"""Hold out every n-th item in the given dictionary.
@@ -91,8 +80,11 @@ def file2heldout_feature_count_files(corpus_path, training_path, heldout_path, d
 	corpus = read_gvfi(corpus_path)
 	(training, heldout) = split_corpus(corpus, denominator)
 
-	corpus2feature_count_file(training, training_path)
-	corpus2feature_count_file(heldout, heldout_path)
+	training_features = corpus2features(training)
+	heldout_features  = corpus2features(heldout)
+
+	features2feature_count_file(training_features, training_path)
+	features2feature_count_file(heldout_features,  heldout_path)
 
 	corpus2file(training, training_path + '.preimage')
-	corpus2file(heldout, heldout_path + '.preimage')
+	corpus2file(heldout,  heldout_path +  '.preimage')
