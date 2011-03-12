@@ -57,14 +57,19 @@ def corpus2file(corpus, out_path):
 			outfile.write('\n')
 
 
-def split_corpus(corpus, denominator=12):
+def split_corpus(corpus, denominator=12, intercept = 4):
 	"""Hold out every n-th item in the given dictionary.
 	   Returns (training, heldout).
 	   Determinismic as long as the keys are fully-ordered.
+	   Warning: the number of rows in the heldout set will vary wildly as
+	   the subset of keys changes, since the keys have different numbers of
+	   rows associated with them.  So change the intercept and denominator
+	   until the size of the heldout set is good.  Of course, don't just
+	   hill-climb on the denominator and intercept.
 	"""
 	training = {}
 	heldout  = {}
-	i = 4 # initial value unimportant but affects which subset we hold out
+	i = intercept % denominator # initial value unimportant but affects which subset we hold out
 	for (k,v) in sorted(corpus.items()):
 		if i == 0:	heldout[k]  = v
 		else:		training[k] = v
