@@ -65,7 +65,7 @@ def split_corpus(corpus, denominator=12, intercept = 4):
 		i = (i + 1) % denominator
 	return (training, heldout)
 
-def file2heldout_feature_count_files(corpus_path, training_path, heldout_path, denominator):
+def file2heldout_feature_count_files(corpus_path, training_path, heldout_path, denominator, intercept):
 	"""Compute feature counts, output to training_path, hold out
 	   every denominator-th article in the corpus and output it to
 	   holdout_path.  An article will never show up in both the training
@@ -78,7 +78,7 @@ def file2heldout_feature_count_files(corpus_path, training_path, heldout_path, d
 	   training_path.preimage and deldout_path.preimage.
 	"""
 	corpus = read_gvfi(corpus_path)
-	(training, heldout) = split_corpus(corpus, denominator)
+	(training, heldout) = split_corpus(corpus, denominator, intercept)
 
 	training_features = corpus2features(training)
 	heldout_features  = corpus2features(heldout)

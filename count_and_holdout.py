@@ -19,4 +19,4 @@ denominator = options.denominator or 12
 intercept   = options.intercept   or 4
 denominator, intercept = int(denominator), int(intercept)
 
-file2heldout_feature_count_files(corpus_path, training_path, heldout_path, denominator)
+file2heldout_feature_count_files(corpus_path, training_path, heldout_path, denominator, intercept)
