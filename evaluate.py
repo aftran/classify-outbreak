@@ -9,6 +9,7 @@
    different values of --intercept.  They default to 12 and 4, respectively.
 """
 
+from pprint           import pprint
 from feature_counting import file2heldout_feature_count_files
 from optparse         import OptionParser
 from maxent           import MaxentModel
@@ -23,4 +24,11 @@ denominator = options.denominator or 12
 intercept   = options.intercept   or 4
 denominator, intercept = int(denominator), int(intercept)
 
-something_TODO = evaluate(corpus_path, denominator, intercept)
+accuracy, precisions, recalls, f1s = evaluate(corpus_path, denominator, intercept)
+print "Accuracy: " + str(accuracy)
+print "Precisions:"
+pprint(precisions)
+print "Recalls:"
+pprint(recalls)
+print("F scores:")
+pprint(f1s)
