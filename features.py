@@ -100,6 +100,7 @@ matcher_features = map(make_searcher, [
 	# Things I'm trying out because of their counts:
 	'president',
 	'&lt;img', # Has a picture.  Good for 'unrelated'.
+	'&lt;a ', # Has a hyperlink.
 
 	# These seem like they would show up in non-outbreak or non-disease articles:
 	'rival',
