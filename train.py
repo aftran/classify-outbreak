@@ -4,24 +4,12 @@
 """
 
 from optparse         import OptionParser
-from maxent           import MaxentModel
-from datum            import *
-from features         import feature_templates
-from feature_counting import *
+
+from evaluation       import *
 
 option_parser = OptionParser()
 (_, [corpus_path, out_path]) = option_parser.parse_args()
 
-corpus = read_gvfi(corpus_path)
-
-m = MaxentModel()
-m.begin_add_event()
-
-for datums in corpus.values():
-	for datum in datums:
-		m.add_event(datum2features(datum), datum.is_related)
-
-m.end_add_event()
-
-m.train(100, 'gis', 2)
+loaded_corpus = read_gvfi(corpus_path)
+m,_ = train(loaded_corpus, 30, 'lbfgs', 2)
 m.save(out_path)
