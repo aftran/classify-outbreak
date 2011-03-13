@@ -4,6 +4,7 @@
 
 from datum    import *
 from features import *
+from copy     import deepcopy
 
 def datum2features(datum):
 	"""The features for the given datum, in list form."""
@@ -51,7 +52,15 @@ def collapse_annotations(datums):
 	   aggregate them into just one datum.
 	"""
 	if datums == []: raise "Empty list passed to collapse_annotations."
-	return max(datums, key=lambda d: d._trust) # TODO: Stub; we should aggregate these reasonably.
+	votes = dict()
+	for outcome in non_ignored_classes:
+		votes[outcome] = 0
+	for datum in datums:
+		votes[datum.is_related] += float(datum._trust)
+	winner = max(votes, key=votes.get)
+	result = deepcopy(datums.pop())
+	result.is_related = winner
+	return result
 
 def split_corpus(corpus, denominator=12, intercept = 4):
 	"""Hold out every n-th item in the given dictionary.
