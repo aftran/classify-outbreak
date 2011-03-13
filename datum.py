@@ -18,7 +18,7 @@ class Datum:
 			_, # self._started_at,
 			_, # self._tainted,
 			_, # self._channel,
-			_, # self._trust,
+			self._trust,
 			_, # self._worker_id,
 			_, # self._country,
 			_, # self._region,

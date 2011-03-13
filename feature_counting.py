@@ -46,11 +46,22 @@ def corpus2file(corpus, out_path):
 			outfile.write(datum.is_related)
 			outfile.write('\n')
 
+def collapse_annotations(datums):
+	"""Given a list of datums that correspond to the same article
+	   aggregate them into just one datum.
+	"""
+	if datums == []: raise "Empty list passed to collapse_annotations."
+	return max(datums, key=lambda d: d._trust) # TODO: Stub; we should aggregate these reasonably.
+
 def split_corpus(corpus, denominator=12, intercept = 4):
 	"""Hold out every n-th item in the given dictionary.
 	   Returns (training, heldout).
 	   Determinismic as long as the keys are fully-ordered.
-	   Warning: the number of rows in the heldout set will vary wildly as
+	   Although the corpus might have multiple annotations per article, the
+	   heldout corpus will only have one annotation per article, chosen by
+	   a weighted vote of all the annotations for that article (weighed by
+	   the worker trust).
+	   Warning: the number of rows in the heldout set will vary as
 	   the subset of keys changes, since the keys have different numbers of
 	   rows associated with them.  So change the intercept and denominator
 	   until the size of the heldout set is good.  Of course, don't just
@@ -60,7 +71,7 @@ def split_corpus(corpus, denominator=12, intercept = 4):
 	heldout  = {}
 	i = intercept % denominator # initial value unimportant but affects which subset we hold out
 	for (k,v) in sorted(corpus.items()):
-		if i == 0:	heldout[k]  = v
+		if i == 0:	heldout[k]  = [collapse_annotations(v)]
 		else:		training[k] = v
 		i = (i + 1) % denominator
 	return (training, heldout)
