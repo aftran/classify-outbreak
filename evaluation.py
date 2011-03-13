@@ -25,7 +25,7 @@ def evaluate(corpus_path, denominator, intercept):
 
         model, _ = train(training, 30, 'lbfgs', 2)
 
-	results = predicted_and_actual_outcomes(model, heldout)
+	raw = predicted_and_actual_outcomes(model, heldout)
 
 	# predicteds/desireds will be maps from classes (=outcomes) to sets of
 	# corpus rows predicted/desired to be in that class:
@@ -36,7 +36,7 @@ def evaluate(corpus_path, denominator, intercept):
 			dictionary[outcome] = set()
 
 	num_correct = 0
-	for (row, (desired, predicted)) in results.items():
+	for (row, (desired, predicted)) in raw.items():
 		predicteds[predicted].add(row)
 		desireds[desired].add(row)
 		if desired == predicted:
@@ -44,7 +44,7 @@ def evaluate(corpus_path, denominator, intercept):
 			# TODO: If we weigh by the annotation's trust, we
 			# should use the annotation's trust here (and
 			# elsewhere) instead of 1.
-	accuracy = float(num_correct) / float(len(results))
+	accuracy = float(num_correct) / float(len(raw))
 	precisions = dict()
 	recalls    = dict()
 	f1s        = dict()
@@ -54,7 +54,7 @@ def evaluate(corpus_path, denominator, intercept):
 		precisions[outcome] = nltk.precision(reference, test)
 		recalls   [outcome] = nltk.recall   (reference, test)
 		f1s       [outcome] = nltk.f_measure(reference, test) # TODO: feed it the right alpha (third arg) for f1.
-	return accuracy, precisions, recalls, f1s
+	return accuracy, precisions, recalls, f1s, raw
 
 def predicted_and_actual_outcomes(model, heldout):
 	result = dict()

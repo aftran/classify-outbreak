@@ -18,13 +18,21 @@ from evaluation       import *
 option_parser = OptionParser()
 option_parser.add_option('--denominator', '-d')
 option_parser.add_option('--intercept',   '-i')
+option_parser.add_option('--raw_out',     '-r')
 (options, [corpus_path]) = option_parser.parse_args()
 
 denominator = options.denominator or 12
 intercept   = options.intercept   or 4
 denominator, intercept = int(denominator), int(intercept)
 
-accuracy, precisions, recalls, f1s = evaluate(corpus_path, denominator, intercept)
+accuracy, precisions, recalls, f1s, raw = evaluate(corpus_path, denominator, intercept)
+
+if options.raw_out:
+	out_file = open(options.raw_out, 'w')
+	for (row_in_corpus, (desired, predicted)) in raw.items():
+		out_line = [str(row_in_corpus), '	', str(desired), '	', str(predicted), '\n']
+		map(out_file.write, out_line)
+
 print "Accuracy: " + str(accuracy)
 print "Precisions:"
 pprint(precisions)
