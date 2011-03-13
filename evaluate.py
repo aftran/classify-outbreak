@@ -29,8 +29,8 @@ accuracy, precisions, recalls, f1s, raw = evaluate(corpus_path, denominator, int
 
 if options.raw_out:
 	out_file = open(options.raw_out, 'w')
-	for (row_in_corpus, (desired, predicted)) in raw.items():
-		out_line = [str(row_in_corpus), '	', str(desired), '	', str(predicted), '\n']
+	for (key, (desired, predicted)) in raw.items():
+		out_line = [str(key), '	', str(desired), '	', str(predicted), '\n']
 		map(out_file.write, out_line)
 
 print "Accuracy: " + str(accuracy)

@@ -64,5 +64,5 @@ def predicted_and_actual_outcomes(model, heldout):
 			desired = datum.is_related
 			distribution = dict(model.eval_all(projection))
 			predicted = max(distribution, key=lambda k: distribution[k])
-			result[datum.row_in_corpus] = (desired, predicted)
+			result[str(datum.row_in_corpus) + '_id' + str(datum.id_article)] = (desired, predicted)
 	return result

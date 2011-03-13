@@ -10,7 +10,7 @@ non_ignored_classes = ['unrelated', 'just_disease', 'outbreak'] # ignore 'cant_t
 class Datum:
 	def __init__(self, row, row_number):
 		[
-			_, # self._unit_id,
+			self._unit_id,
 			_, # self._created_at,
 			_, # self._golden,
 			_, # self._id,
