@@ -1,4 +1,5 @@
 import csv
+from pprint import *
 
 """Wrapper around the contents of one line in a GVFI-annotated corpus of web
    documents.
@@ -7,7 +8,7 @@ import csv
 non_ignored_classes = ['unrelated', 'just_disease', 'outbreak'] # ignore 'cant_tell' and ''
 
 class Datum:
-	def __init__(self, row):
+	def __init__(self, row, row_number):
 		[
 			_, # self._unit_id,
 			_, # self._created_at,
@@ -36,8 +37,7 @@ class Datum:
 			self.language,
 			self.title
 		] = row
-
-from pprint import *
+		self.row_in_corpus = row_number
 
 def read_gvfi(path):
 	"""Turns a GVFI file into a dictionary from IDs to lists of Datums."""
@@ -46,8 +46,10 @@ def read_gvfi(path):
 	reader = csv.reader(csvfile, dialect=csv.excel)
 
 	result = {}
+	row_number = 1
 	for row in reader:
-		datum = Datum(row)
+		datum = Datum(row, row_number)
+		row_number += 1
 		if datum.is_related in non_ignored_classes:
 			result.setdefault(datum.id_article, [])
 			result[datum.id_article].append(datum)

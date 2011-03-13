@@ -41,7 +41,7 @@ def corpus2file(corpus, out_path):
 	outfile = open(out_path, 'w')
 	for datums in corpus.values():
 		for datum in datums:
-			outfile.write(datum.id_article)
+			outfile.write(str(datum.row_in_corpus) + '_' + str(datum.id_article))
 			outfile.write('	')
 			outfile.write(datum.is_related)
 			outfile.write('\n')
