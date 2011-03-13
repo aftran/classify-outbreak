@@ -2,6 +2,7 @@ from re     import search, IGNORECASE
 from string import strip, punctuation
 import re
 import nltk
+import pickle
 
 "Features for the classifier."
 
@@ -18,10 +19,10 @@ def make_searcher(pattern, field='article_snippet', flags=IGNORECASE):
 	return result
 
 # stemmer = lambda x: x
-# stemmer = nltk.PorterStemmer().stem
+stemmer = nltk.PorterStemmer().stem
 
-stems_regexp = '(ing)|(ed)|(ly)|(s)' # Very messy but might work anyway.
-stemmer = nltk.RegexpStemmer(stems_regexp, min=3).stem
+# stems_regexp = '(ing)|(ed)|(ly)|(s)' # Very messy but might work anyway.
+# stemmer = nltk.RegexpStemmer(stems_regexp, min=3).stem
 
 # stemmer = nltk.LancasterStemmer().stem
 # stemmer = nltk.WordNetLemmatizer().lemmatize
@@ -46,19 +47,23 @@ def subdomain(datum):
 		result.append('subdomain_' + m.groups()[1])
 	return result
 
-# Since NER is slow, only do it for the first cutoff_for_ner characters of the
-# article_snippet:
-cutoff_for_ner = 200
-# Again, since NER is slow, only do it for the first
-# per_sentence_cutoff_for_ner characters of each sentence:
-per_sentence_cutoff_for_ner = 10
+try:	stored_ner_results = pickle.load(open('named_entities.pickle'))
+except:
+	print "Can't find named_entities.pickle.",
+	"To generate it, run: ./bake_for_ner.py <path to your corpus> named_entities.pickle"
+	raise
 
 def named_entities(datum):
+	"""Makes a feature for each named entity (including its type, like
+	   "PERSON" or "ORGANIZATION").  Also makes a feature for whether a
+	   certain type of named entity is present.
+	"""
 	result = []
-	for sent in nltk.sent_tokenize(datum.article_snippet[:cutoff_for_ner]):
-		for chunk in nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sent[:per_sentence_cutoff_for_ner]))):
-			if hasattr(chunk, 'node'):
-				result.append('article_snippet_has_entity_' + chunk.node + '_' +  '_'.join(stemmer(c[0].lower()) for c in chunk.leaves()))
+	datum_ner_results = stored_ner_results[datum.id_article]
+	for (entity_type, entity_list) in datum_ner_results.items():
+		result.append('has_entities_of_type_' + entity_type)
+		for entity in entity_list:
+			result.append('has_entity_' + entity_type + '_' + stemmer(entity))
 	return result
 
 matcher_features = map(make_searcher, [
@@ -110,7 +115,7 @@ matcher_features = map(make_searcher, [
 	)
 
 other_features = [
-	# named_entities, # Temp. commented out for speed.
+	named_entities,
 	make_searcher('(epi|pan)demic', 'title'),
 	make_searcher('H\dN\d', field='article_snippet', flags=0), # names of flu subtypes, like H1N1
 	stems_in('title'),
