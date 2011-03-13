@@ -40,7 +40,7 @@ def subdomain(datum):
 	"""Makes a feature for the subdomain.  For example, an article from
 	   www2.portal.nature.com will have the subbdomain_portal.nature.com feature.
 	"""
-	m = re.match('http://(www.?\.)?([^/]*)/(([^/]*/)*)', datum.article_url)
+	m = re.match('http://(www.?.?\.)?([^/]*)/(([^/]*/)*)', datum.article_url)
 	result = []
 	if hasattr(m, 'groups') and len(m.groups()) > 1:
 		result.append('subdomain_' + m.groups()[1])
@@ -63,6 +63,10 @@ def named_entities(datum):
 
 matcher_features = map(make_searcher, [
 	# These seem likely to show up in articles about disease:
+	'human',
+	'hospitalize',
+	'adult',
+	'children',
 	'cases',
 	'positive',
 	'fever'
