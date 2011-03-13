@@ -17,7 +17,13 @@ def make_searcher(pattern, field='article_snippet', flags=IGNORECASE):
 			return []
 	return result
 
-stemmer = nltk.LancasterStemmer().stem
+# stemmer = lambda x: x
+# stemmer = nltk.PorterStemmer().stem
+
+stems_regexp = '(ing)|(ed)|(ly)|(s)' # Very messy but might work anyway.
+stemmer = nltk.RegexpStemmer(stems_regexp, min=3).stem
+
+# stemmer = nltk.LancasterStemmer().stem
 # stemmer = nltk.WordNetLemmatizer().lemmatize
 
 def stems_in(field):
@@ -42,7 +48,7 @@ def subdomain(datum):
 
 # Since NER is slow, only do it for the first cutoff_for_ner characters of the
 # article_snippet:
-cutoff_for_ner = 1000
+cutoff_for_ner = 200
 # Again, since NER is slow, only do it for the first
 # per_sentence_cutoff_for_ner characters of each sentence:
 per_sentence_cutoff_for_ner = 10
@@ -57,6 +63,9 @@ def named_entities(datum):
 
 matcher_features = map(make_searcher, [
 	# These seem likely to show up in articles about disease:
+	'cases',
+	'positive',
+	'fever'
 	'estimated',
 	'exposure',
 	'percent',
@@ -67,7 +76,6 @@ matcher_features = map(make_searcher, [
 	'report',
 	'prevention',
 	'control',
-	'disease',
 	'confirmed',
 	'diagnosed',
 	'diagnosis',
@@ -98,15 +106,16 @@ matcher_features = map(make_searcher, [
 	)
 
 other_features = [
-	named_entities,
+	# named_entities, # Temp. commented out for speed.
 	make_searcher('(epi|pan)demic', 'title'),
 	make_searcher('H\dN\d', field='article_snippet', flags=0), # names of flu subtypes, like H1N1
 	stems_in('title'),
+	stems_in('article_snippet'),
 	# TODO: Maybe strip away non-word symbols like in "(ap)" and "prosecutors:".
 	# TODO: Maybe get the word STEMS in the title, not the words.
 	# TODO: Replace all numbers with a single digit or something.
 	subdomain
 	# TODO: Other URL features.
 	]
-
 feature_templates = matcher_features + other_features
+# feature_templates = [lambda datum: datum.is_related] # For debugging.
