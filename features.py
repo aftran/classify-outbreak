@@ -3,6 +3,7 @@ from string import strip, punctuation
 import re
 import nltk
 import pickle
+import xml.sax.saxutils
 
 "Features for the classifier."
 
@@ -27,10 +28,14 @@ stemmer = nltk.PorterStemmer().stem
 # stemmer = nltk.LancasterStemmer().stem
 # stemmer = nltk.WordNetLemmatizer().lemmatize
 
+def clean_up(text):
+	return nltk.clean_html(xml.sax.saxutils.unescape(text))
+
 def stems_in(field):
 	"""Makes a feature for each stem in the given field."""
 	def result(datum):
 		stemset = set()
+		text = clean_up(datum.__dict__[field])
 		def mkfeature(string): return field + '_has_stem_' + string
 		for word in datum.__dict__[field].split():
 			stemset.add(stemmer(strip(word.lower(), punctuation)))
