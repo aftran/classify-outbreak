@@ -12,7 +12,7 @@ def train(corpus, *args):
 	for datums in corpus.values():
 		for datum in datums:
 			projection = datum2features(datum)
-			model.add_event(datum2features(datum), datum.is_related)
+			model.add_event(datum2features(datum), datum.is_related, long(100 * float(datum._trust)))
 			projections[datum.row_in_corpus] = projection
 	model.end_add_event()
 	model.train(*args)
