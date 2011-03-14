@@ -71,8 +71,22 @@ def named_entities(datum):
 			result.append('has_entity_' + entity_type + '_' + stemmer(entity))
 	return result
 
+try:	disease_gazetteer = pickle.load(open('disease_gazetteer.pickle'))
+except:
+	print "Can't find disease_gazetteer.pickle.",
+	"To generate it, run: ./make_gazetteer.bat"
+	raise
+
+def has_disease_in_gazetteer(datum):
+	for disease_name in disease_gazetteer:
+		if search(disease_name, datum.article_snippet, flags=IGNORECASE) or \
+		   search(disease_name, datum.title,           flags=IGNORECASE):
+			return ['has_disease_in_gazetteer']
+	return []
+
 matcher_features = map(make_searcher, [
 	# These seem likely to show up in articles about disease:
+	'rrhea',
 	'human',
 	'hospitalize',
 	'adult',
@@ -106,6 +120,8 @@ matcher_features = map(make_searcher, [
 	'president',
 	'&lt;img', # Has a picture.  Good for 'unrelated'.
 	'&lt;a ', # Has a hyperlink.
+	# TODO: has_hyperlink_to_subdomain_
+	# Maybe try 'has a month in it'.
 
 	# These seem like they would show up in non-outbreak or non-disease articles:
 	'rival',
@@ -129,8 +145,9 @@ other_features = [
 	# TODO: Maybe strip away non-word symbols like in "(ap)" and "prosecutors:".
 	# TODO: Maybe get the word STEMS in the title, not the words.
 	# TODO: Replace all numbers with a single digit or something.
-	subdomain
+	subdomain,
 	# TODO: Other URL features.
+	has_disease_in_gazetteer,
 	]
 feature_templates = matcher_features + other_features
 # feature_templates = [lambda datum: datum.is_related] # For debugging.
